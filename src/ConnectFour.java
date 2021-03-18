@@ -9,9 +9,7 @@ import static javax.swing.JOptionPane.showMessageDialog;
 
 public class ConnectFour extends JFrame {
 
-    private ArrayList<Player> players = new ArrayList<>();
-
-    private PlayArea playArea = new PlayArea();
+    private PlayArea playArea;
 
     enum Player {
         ONE, TWO
@@ -24,7 +22,8 @@ public class ConnectFour extends JFrame {
 
     }
 
-    public void init() {
+    public void init(int playerOneScore, int playerTwoScore) {
+        playArea = new PlayArea(playerOneScore, playerTwoScore);
         add(playArea);
         this.setVisible(true);
     }
@@ -44,19 +43,23 @@ public class ConnectFour extends JFrame {
         // set the Player.ONE goes first
         private Player player = Player.ONE;
 
-        // flag for checking winner
-        private boolean winner = false;
-        private boolean firstTime = true; // flag to avoid painting circles when program is starting
+        // starting scores
+        private int playerOneScore;
+        private int playerTwoScore;
 
         // set of points that define where next discs will be dropped
         private Point[] points = new Point[COLS];
 
-        public PlayArea() {
+        public PlayArea( int playerOneScore, int playerTwoScore) {
             // this class will catch mouse clicks
             addMouseListener(this);
 
             // background of the play area
-            setBackground(Color.lightGray);
+            setBackground(new Color(241, 250, 238));
+
+            // set the score
+            this.playerOneScore = playerOneScore;
+            this.playerTwoScore = playerTwoScore;
 
             // initialise set of starting points for each of the playing columns
             w = 750;
@@ -68,15 +71,12 @@ public class ConnectFour extends JFrame {
                 points[i] = new Point(startingX + (offsetX * i), y);
             }
 
-//            for(int i = 0; i < rows; i++) {
-//                for (int j = 0; j < cols; j++) {
-//                    if (playersMoves[j][i] == (char)0 ) {
-//                        System.out.println("true");
-//                    }
-//                }
-//            }
         }
 
+        /**
+         * Drawing lines that form the grid of connect4 game
+         * @param g Graphisc of the JPanel
+         */
         public void drawGrid(Graphics g) {
             Graphics2D g2d = (Graphics2D) g;
 
@@ -92,28 +92,13 @@ public class ConnectFour extends JFrame {
             for (int i = 1; i < playersMoves.length; i++) {
                 g2d.drawLine(0, ((h / playersMoves.length) * i) + offset, w, ((h / playersMoves.length) * i) + offset);
             }
-
-
         }
 
-        public void drawValues(Graphics g) {
-            Graphics2D g2d = (Graphics2D) g;
-
-            g2d.setPaint(new Color(150, 150, 150));
-
-            RenderingHints rh = new RenderingHints(
-                    RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON);
-
-            rh.put(RenderingHints.KEY_RENDERING,
-                    RenderingHints.VALUE_RENDER_QUALITY);
-
-            g2d.setRenderingHints(rh);
-
-            g2d.fill(new Ellipse2D.Double(10, 100, 107, 107));
-
-        }
-
+        /**
+         * Method is handling click on the grid, calls draw disc on grid,
+         * checks if game is not won yet
+         * @param e click event
+         */
         public void gridClicked(MouseEvent e) {
             Point p = e.getPoint();
             int colClicked = getColumnClicked(p);
@@ -133,10 +118,26 @@ public class ConnectFour extends JFrame {
 
             // check if won
             if (isConnected(row, colClicked, color)) {
+
                 // player won
-                System.out.println("Player " + player + " has won");
-                showMessageDialog(null, "Player " + player + " has won");
-                System.exit(0);
+                if (player == Player.ONE) {
+                    playerOneScore++;
+                } else {
+                    playerTwoScore++;
+                }
+
+                int result = JOptionPane.showConfirmDialog(null,
+                        "Player 1 score: " + playerOneScore + "\nPlayer 2 score: " + playerTwoScore + "\nWould you like to play again? ",
+                        "Game Finished",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE);
+                // 0=yes, 1=no, 2=cancel
+                if(result == JOptionPane.YES_OPTION){
+                    new ConnectFour().init(playerOneScore, playerTwoScore);
+                }else if (result == JOptionPane.NO_OPTION){
+                    System.exit(0);
+                }
+
             }
             else {
                 // switch player turns
@@ -146,17 +147,22 @@ public class ConnectFour extends JFrame {
                     player = Player.ONE;
                 }
             }
-
         }
 
+        /**
+         * Method is painting a colored circle in the lowest possible point
+         * of the column that was clicked by user.
+         * If circles were drawn below, the new circle appears on top of it
+         * @param col index of culumn that was clicked
+         */
         public void paintDisk(int col) {
             Graphics2D g2d = (Graphics2D) this.getGraphics();
 
             // set color
             if (player == Player.ONE) {
-                g2d.setPaint(Color.RED);
+                g2d.setPaint(new Color(230, 57, 70));
             } else {
-                g2d.setPaint(Color.BLUE);
+                g2d.setPaint(new Color(29, 53, 87));
             }
 
             RenderingHints rh = new RenderingHints(
@@ -202,20 +208,15 @@ public class ConnectFour extends JFrame {
             System.out.println("H " + h);
 
             drawGrid(g);
-
-            if (!firstTime) {
-                drawValues(g);
-            }
-
-            //next time repaint is called, the shapes will be drawn
-            firstTime = false;
         }
 
         /**
          * Player ONE is starting the game with Red color disks
          * we need to fill the matrix with values "R" or "B"
          * where R will correspond to Player ONE action
-         * and B to Player TWO action
+         * and B to Player TWO action. The playersMoves matrix represents player
+         * moves and helps to check win conditions.
+         *
          * @param col the column that corresponds to user click
          * @return position of the row
          */
@@ -245,11 +246,19 @@ public class ConnectFour extends JFrame {
         }
 
 
-
+        /**
+         * Method checks if recently dropped move connects 4 discs of the
+         * same color in one of the directions: vertical, horizontal or diagonal
+         * @param row coordinate of player move in rows
+         * @param col coordinate of player move in columns
+         * @param playerColor color of the disc that was dropped: 'B' blue or 'R' red
+         * @return true if the move connects four discs of the same color, false of not
+         */
         public boolean isConnected(int row, int col, char playerColor) {
             // "score" for current cell
             int score = 1;
 
+            // vertical check
             int top = scanDir(playerColor, row, col, -1, 0);
             int bottom = scanDir(playerColor, row, col, +1, 0);
 
@@ -257,6 +266,7 @@ public class ConnectFour extends JFrame {
                 return true;
             }
 
+            // horizontal check
             int left = scanDir(playerColor, row, col, 0, -1);
             int right = scanDir(playerColor, row, col, 0, +1);
 
@@ -264,6 +274,7 @@ public class ConnectFour extends JFrame {
                 return true;
             }
 
+            // diagonal check from top left to bottom right \
             int topLeft = scanDir(playerColor, row, col, -1, -1);
             int bottomRight = scanDir(playerColor, row, col, +1, +1);
 
@@ -271,6 +282,7 @@ public class ConnectFour extends JFrame {
                 return true;
             }
 
+            // diagonal check from top rigtt to bottom left /
             int topRight = scanDir(playerColor, row, col, -1, +1);
             int bottomLeft = scanDir(playerColor, row, col, +1, -1);
 
@@ -281,6 +293,16 @@ public class ConnectFour extends JFrame {
             return false;
         }
 
+        /**
+         * Method is checking if discs with coordinates [prevRow][prevCol] and [rowShift][colShift]
+         * connect with the same color
+         * @param playerColor color that is checked 'B' blue or 'R' red
+         * @param prevRow row coordinate
+         * @param prevCol column coordinate
+         * @param rowShift shift row coordinate
+         * @param colShift shift column coordinate
+         * @return number of connected discs of the same color
+         */
         public int scanDir(char playerColor, int prevRow, int prevCol, int rowShift, int colShift) {
             int row = prevRow + rowShift;
             int col = prevCol + colShift;
@@ -328,22 +350,9 @@ public class ConnectFour extends JFrame {
 
 
 
-
-        public boolean checkDiagonal() {
-            char centre = playersMoves[1][1];
-
-            winner = false;
-
-            if (playersMoves[0][0] == centre && playersMoves[2][2] == centre && centre != '\0')
-                winner = true;
-
-            if (playersMoves[2][0] == centre && playersMoves[0][2] == centre && centre != '\0')
-                winner = true;
-
-            return winner;
-        }
-
-        public boolean checkAccross() {
+        // First attempts to check across and down. These worked, but
+        // I could not adapt them to cover all diagonal chances.
+        public boolean checkAcross() {
             boolean playerWon = false;
 
             // 4 consequent disks are needed to win

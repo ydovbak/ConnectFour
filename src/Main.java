@@ -18,6 +18,10 @@ public class Main {
             play.addActionListener(this);
             exit.addActionListener(this);
 
+            Color bgColor = new Color(241, 250, 238);
+            play.setBackground(bgColor);
+            exit.setBackground(bgColor);
+
             add(play);
             add(exit);
 
@@ -29,7 +33,8 @@ public class Main {
         public void actionPerformed(ActionEvent e) {
 
             if (e.getSource() == play) {
-                new ConnectFour().init();
+                // init Connect4 with 0,0 starting scoreboard
+                new ConnectFour().init(0,0);
             }
             else
             {
