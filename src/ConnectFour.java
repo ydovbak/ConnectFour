@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 
@@ -16,10 +17,9 @@ public class ConnectFour extends JFrame {
     }
 
     public ConnectFour() {
+        this.setResizable(false);
         setSize(750, 750);
         setTitle("Connect 4");
-
-
     }
 
     public void init(int playerOneScore, int playerTwoScore) {
@@ -64,9 +64,16 @@ public class ConnectFour extends JFrame {
             // initialise set of starting points for each of the playing columns
             w = 750;
             h = 642;
-            int y = h - (h / ROWS - 1);
-            int startingX = 2;
-            int offsetX = w / COLS;
+
+            // using trial and error method, this is best version for Mac
+            //int y = h - (h / ROWS - 1);
+            //int startingX = 2;
+            //int offsetX = w / COLS;
+
+            // using trial and error method, this is best version for Windows
+            int y = h  - (h / ROWS / 2 - 10);
+            int startingX = 1;
+            int offsetX = w / COLS - 2;
             for (int i = 0; i < points.length; i++) {
                 points[i] = new Point(startingX + (offsetX * i), y);
             }
@@ -133,6 +140,8 @@ public class ConnectFour extends JFrame {
                         JOptionPane.QUESTION_MESSAGE);
                 // 0=yes, 1=no, 2=cancel
                 if(result == JOptionPane.YES_OPTION){
+                   this.setVisible(false);
+                   dispose();
                     new ConnectFour().init(playerOneScore, playerTwoScore);
                 }else if (result == JOptionPane.NO_OPTION){
                     System.exit(0);

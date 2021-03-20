@@ -13,7 +13,7 @@ public class Main {
         {
             setLayout(new GridLayout(2,1));
             setSize(400, 400);
-            setTitle("TicTacToe Menu");
+            setTitle("Connect4 Menu");
 
             play.addActionListener(this);
             exit.addActionListener(this);
