@@ -18,7 +18,7 @@ public class ConnectFour extends JFrame {
 
     public ConnectFour() {
         this.setResizable(false);
-        setSize(750, 750);
+        setSize(750, 642);
         setTitle("Connect 4");
     }
 
@@ -31,8 +31,8 @@ public class ConnectFour extends JFrame {
     class PlayArea extends JPanel implements MouseListener {
 
         // connect four has 7 columns and 6 rows
-        final int ROWS = 6;
         final int COLS = 7;
+        final int ROWS = 6;
 
         // this array will save the moves of both players "R" - player ONE, "B" - player TWO
         private char[][] playersMoves = new char[ROWS][COLS];
@@ -64,14 +64,6 @@ public class ConnectFour extends JFrame {
             // initialise set of starting points for each of the playing columns
             w = 750;
             h = 642;
-
-            // using trial and error method, this is best version for Windows
-//            int y = (h / ROWS) - (105);
-//            int startingX = 1;
-//            int offsetX = (w / COLS);
-//            for (int i = 0; i < points.length; i++) {
-//                points[i] = new Point(startingX + (offsetX * i), y);
-//            }
 
         }
 
@@ -109,47 +101,52 @@ public class ConnectFour extends JFrame {
             int row = playerDroppedDisc(colClicked);
 
             System.out.println("Click on cell: " + row+ ", " + colClicked);
-            paintDisk(row, colClicked);
 
-            // set the color
-            char color;
-            if (player == Player.ONE) {
-                color = 'R';
-            } else {
-                color = 'B';
-            }
+            // check if discs didn't reach the top yet
+            if (row >= 0) {
+                paintDisk(row, colClicked);
 
-            // check if won
-            if (isConnected(row, colClicked, color)) {
 
-                // player won
+                // set the color
+                char color;
                 if (player == Player.ONE) {
-                    playerOneScore++;
+                    color = 'R';
                 } else {
-                    playerTwoScore++;
+                    color = 'B';
                 }
 
-                int result = JOptionPane.showConfirmDialog(null,
-                        "Player 1 score: " + playerOneScore + "\nPlayer 2 score: " + playerTwoScore + "\nWould you like to play again? ",
-                        "Game Finished",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE);
-                // 0=yes, 1=no, 2=cancel
-                if(result == JOptionPane.YES_OPTION){
-                   this.setVisible(false);
-                   dispose();
-                    new ConnectFour().init(playerOneScore, playerTwoScore);
-                }else if (result == JOptionPane.NO_OPTION){
-                    System.exit(0);
-                }
+                // check if won
+                if (isConnected(row, colClicked, color)) {
 
-            }
-            else {
-                // switch player turns
-                if (player == Player.ONE) {
-                    player = Player.TWO;
-                } else {
-                    player = Player.ONE;
+                    // player won
+                    if (player == Player.ONE) {
+                        playerOneScore++;
+                    } else {
+                        playerTwoScore++;
+                    }
+
+                    int result = JOptionPane.showConfirmDialog(null,
+                            "\nPlayer 1 score: " + playerOneScore + "\nPlayer 2 score: " + playerTwoScore + "\nWould you like to play again? ",
+                            "Game Finished",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE);
+                    // 0=yes, 1=no, 2=cancel
+                    if(result == JOptionPane.YES_OPTION){
+                        this.setVisible(false);
+                        dispose();
+                        new ConnectFour().init(playerOneScore, playerTwoScore);
+                    }else if (result == JOptionPane.NO_OPTION){
+                        System.exit(0);
+                    }
+
+                }
+                else {
+                    // switch player turns
+                    if (player == Player.ONE) {
+                        player = Player.TWO;
+                    } else {
+                        player = Player.ONE;
+                    }
                 }
             }
         }
@@ -182,8 +179,8 @@ public class ConnectFour extends JFrame {
             double cellWidth = (w / COLS);
             double cellHeight = (h / ROWS);
 
-            double circleWidth = cellWidth * 0.8;
-            double circleHeight = cellHeight * 0.8;
+            double circleWidth = cellWidth * 0.85;
+            double circleHeight = cellHeight * 0.85;
 
             double offsetX = cellWidth * 0.1;
             double offsetY = cellHeight * 0.1;
@@ -194,16 +191,6 @@ public class ConnectFour extends JFrame {
             System.out.println("X,Y: " + x + "," + y);
 
             g2d.fill(new Ellipse2D.Double(x, y, circleWidth, circleHeight));
-            // reset starting points and draw circle
-//            for (int i = 0; i < points.length; i++) {
-//                if (i == col) {
-//                    System.out.println("Drawing on point : " + points[i].getX() + ", " + points[i].getY());
-//                    g2d.fill(new Ellipse2D.Double(points[i].getX(), points[i].getY(), 105, 105));
-//                    points[i].y -= h / ROWS;
-//
-//                }
-//            }
-
         }
 
         /**
@@ -242,7 +229,7 @@ public class ConnectFour extends JFrame {
          */
         public int playerDroppedDisc(int col) {
             // used to save the matrix row position of user click
-            int row = 0;
+            int row = -1;
 
             // get the color of the current move pf the player
             char playerColor;
@@ -252,7 +239,7 @@ public class ConnectFour extends JFrame {
                 playerColor = 'B';
             }
 
-            // set the player move on to player moves matrix
+            // set the player move onto playerMoves matrix
             boolean keepGoing = true;
             for (int i = ROWS - 1; i >= 0 && keepGoing; i--) {
                 if (playersMoves[i][col] == (char) 0) {
