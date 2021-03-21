@@ -65,18 +65,13 @@ public class ConnectFour extends JFrame {
             w = 750;
             h = 642;
 
-            // using trial and error method, this is best version for Mac
-            //int y = h - (h / ROWS - 1);
-            //int startingX = 2;
-            //int offsetX = w / COLS;
-
             // using trial and error method, this is best version for Windows
-            int y = h  - (h / ROWS / 2 - 10);
-            int startingX = 1;
-            int offsetX = w / COLS - 2;
-            for (int i = 0; i < points.length; i++) {
-                points[i] = new Point(startingX + (offsetX * i), y);
-            }
+//            int y = (h / ROWS) - (105);
+//            int startingX = 1;
+//            int offsetX = (w / COLS);
+//            for (int i = 0; i < points.length; i++) {
+//                points[i] = new Point(startingX + (offsetX * i), y);
+//            }
 
         }
 
@@ -110,10 +105,11 @@ public class ConnectFour extends JFrame {
             Point p = e.getPoint();
             int colClicked = getColumnClicked(p);
 
-            paintDisk(colClicked);
-
             // fill the playing matrix and get the row pos of the click
             int row = playerDroppedDisc(colClicked);
+
+            System.out.println("Click on cell: " + row+ ", " + colClicked);
+            paintDisk(row, colClicked);
 
             // set the color
             char color;
@@ -164,7 +160,7 @@ public class ConnectFour extends JFrame {
          * If circles were drawn below, the new circle appears on top of it
          * @param col index of culumn that was clicked
          */
-        public void paintDisk(int col) {
+        public void paintDisk(int row, int col) {
             Graphics2D g2d = (Graphics2D) this.getGraphics();
 
             // set color
@@ -183,15 +179,30 @@ public class ConnectFour extends JFrame {
 
             g2d.setRenderingHints(rh);
 
-            // reset starting points and draw circle
-            for (int i = 0; i < points.length; i++) {
-                if (i == col) {
-                    System.out.println("Drawing on point : " + points[i].getX() + ", " + points[i].getY());
-                    g2d.fill(new Ellipse2D.Double(points[i].getX(), points[i].getY(), 105, 105));
-                    points[i].y -= h / ROWS;
+            double cellWidth = (w / COLS);
+            double cellHeight = (h / ROWS);
 
-                }
-            }
+            double circleWidth = cellWidth * 0.8;
+            double circleHeight = cellHeight * 0.8;
+
+            double offsetX = cellWidth * 0.1;
+            double offsetY = cellHeight * 0.1;
+
+            double x = (col * cellWidth) + offsetX;
+            double y = (row * cellHeight) + offsetY;
+
+            System.out.println("X,Y: " + x + "," + y);
+
+            g2d.fill(new Ellipse2D.Double(x, y, circleWidth, circleHeight));
+            // reset starting points and draw circle
+//            for (int i = 0; i < points.length; i++) {
+//                if (i == col) {
+//                    System.out.println("Drawing on point : " + points[i].getX() + ", " + points[i].getY());
+//                    g2d.fill(new Ellipse2D.Double(points[i].getX(), points[i].getY(), 105, 105));
+//                    points[i].y -= h / ROWS;
+//
+//                }
+//            }
 
         }
 
@@ -243,7 +254,7 @@ public class ConnectFour extends JFrame {
 
             // set the player move on to player moves matrix
             boolean keepGoing = true;
-            for (int i = 0; i < playersMoves.length && keepGoing; i++) {
+            for (int i = ROWS - 1; i >= 0 && keepGoing; i--) {
                 if (playersMoves[i][col] == (char) 0) {
                     // if the element at pos [i][col] is empty, initialise it with current user move
                     playersMoves[i][col] = playerColor;
