@@ -5,13 +5,11 @@ import java.awt.event.ActionListener;
 
 public class Main {
 
-    static class MainMenu extends JFrame implements ActionListener
-    {
+    static class MainMenu extends JFrame implements ActionListener {
         private JButton play = new JButton("Play"), exit = new JButton("Exit");
 
-        public MainMenu()
-        {
-            setLayout(new GridLayout(2,1));
+        public MainMenu() {
+            setLayout(new GridLayout(2, 1));
             setSize(400, 400);
             setTitle("Connect4 Menu");
 
@@ -34,10 +32,8 @@ public class Main {
 
             if (e.getSource() == play) {
                 // init Connect4 with 0,0 starting scoreboard
-                new ConnectFour().init(0,0);
-            }
-            else
-            {
+                new ConnectFour().init(0, 0);
+            } else {
                 System.exit(0);
             }
 

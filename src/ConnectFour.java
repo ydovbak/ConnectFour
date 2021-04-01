@@ -50,7 +50,7 @@ public class ConnectFour extends JFrame {
         // set of points that define where next discs will be dropped
         private Point[] points = new Point[COLS];
 
-        public PlayArea( int playerOneScore, int playerTwoScore) {
+        public PlayArea(int playerOneScore, int playerTwoScore) {
             // this class will catch mouse clicks
             addMouseListener(this);
 
@@ -69,6 +69,7 @@ public class ConnectFour extends JFrame {
 
         /**
          * Drawing lines that form the grid of connect4 game
+         *
          * @param g Graphisc of the JPanel
          */
         public void drawGrid(Graphics g) {
@@ -91,6 +92,7 @@ public class ConnectFour extends JFrame {
         /**
          * Method is handling click on the grid, calls draw disc on grid,
          * checks if game is not won yet
+         *
          * @param e click event
          */
         public void gridClicked(MouseEvent e) {
@@ -100,7 +102,7 @@ public class ConnectFour extends JFrame {
             // fill the playing matrix and get the row pos of the click
             int row = playerDroppedDisc(colClicked);
 
-            System.out.println("Click on cell: " + row+ ", " + colClicked);
+            System.out.println("Click on cell: " + row + ", " + colClicked);
 
             // check if discs didn't reach the top yet
             if (row >= 0) {
@@ -131,16 +133,15 @@ public class ConnectFour extends JFrame {
                             JOptionPane.YES_NO_OPTION,
                             JOptionPane.QUESTION_MESSAGE);
                     // 0=yes, 1=no, 2=cancel
-                    if(result == JOptionPane.YES_OPTION){
+                    if (result == JOptionPane.YES_OPTION) {
                         this.setVisible(false);
                         dispose();
                         new ConnectFour().init(playerOneScore, playerTwoScore);
-                    }else if (result == JOptionPane.NO_OPTION){
+                    } else if (result == JOptionPane.NO_OPTION) {
                         System.exit(0);
                     }
 
-                }
-                else {
+                } else {
                     // switch player turns
                     if (player == Player.ONE) {
                         player = Player.TWO;
@@ -155,6 +156,7 @@ public class ConnectFour extends JFrame {
          * Method is painting a colored circle in the lowest possible point
          * of the column that was clicked by user.
          * If circles were drawn below, the new circle appears on top of it
+         *
          * @param col index of culumn that was clicked
          */
         public void paintDisk(int row, int col) {
@@ -256,8 +258,9 @@ public class ConnectFour extends JFrame {
         /**
          * Method checks if recently dropped move connects 4 discs of the
          * same color in one of the directions: vertical, horizontal or diagonal
-         * @param row coordinate of player move in rows
-         * @param col coordinate of player move in columns
+         *
+         * @param row         coordinate of player move in rows
+         * @param col         coordinate of player move in columns
          * @param playerColor color of the disc that was dropped: 'B' blue or 'R' red
          * @return true if the move connects four discs of the same color, false of not
          */
@@ -303,11 +306,12 @@ public class ConnectFour extends JFrame {
         /**
          * Method is checking if discs with coordinates [prevRow][prevCol] and [rowShift][colShift]
          * connect with the same color
+         *
          * @param playerColor color that is checked 'B' blue or 'R' red
-         * @param prevRow row coordinate
-         * @param prevCol column coordinate
-         * @param rowShift shift row coordinate
-         * @param colShift shift column coordinate
+         * @param prevRow     row coordinate
+         * @param prevCol     column coordinate
+         * @param rowShift    shift row coordinate
+         * @param colShift    shift column coordinate
          * @return number of connected discs of the same color
          */
         public int scanDir(char playerColor, int prevRow, int prevCol, int rowShift, int colShift) {
@@ -354,7 +358,6 @@ public class ConnectFour extends JFrame {
         public void mouseExited(MouseEvent e) {
 
         }
-
 
 
         // First attempts to check across and down. These worked, but
